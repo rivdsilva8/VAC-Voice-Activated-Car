@@ -139,15 +139,15 @@ const Speech = () => {
         <h1 className="text-4xl">Voice Control</h1>
         <div className="flex flex-row pt-10">
           <button
-            className={`transition duration-300 p-2 rounded-md ${
+            className={`transition duration-300 p-2 ${
               isListening
-                ? "border-blue-500 border strobe text-blue-500 bg-transparent"
-                : "bg-blue-500 text-white"
+                ? "  strobe text-black bg-yellow-500"
+                : "bg-stone-600 text-white"
             }`}
             onClick={handleToggleListening}
           >
             {isListening
-              ? "Currently Listening, Stop listening"
+              ? "Currently Listening,Click to Stop listening"
               : "Start listening"}
           </button>
         </div>
@@ -167,7 +167,7 @@ const Speech = () => {
         </div>
       </div>
       <div className="pt-5">
-        <h2 className="text-2xl">Transcript:</h2>
+        <h2 className="text-2xl">Command Array:</h2>
         <button
           onClick={toggleShowTranscript}
           className="mt-2 p-2 bg-green-500 text-white rounded"
