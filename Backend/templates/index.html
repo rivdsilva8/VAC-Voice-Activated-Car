@@ -1,0 +1,41 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SocketIO Client</title>
+  </head>
+  <body>
+    <h1>Flask-SocketIO Demo</h1>
+    <input type="text" id="commandInput" placeholder="Type your command" />
+    <button onclick="sendCommand()">Send</button>
+
+    <ul id="commands"></ul>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+      const socket = io({
+        transports: ["polling"], // Use only polling
+      });
+
+      socket.on("connect", function () {
+        console.log("Connected to server");
+      });
+
+      socket.on("command", function (data) {
+        const commands = document.getElementById("commands");
+        const li = document.createElement("li");
+        li.appendChild(document.createTextNode(data));
+        commands.appendChild(li);
+      });
+
+      function sendCommand() {
+        const input = document.getElementById("commandInput");
+        const command = input.value;
+        socket.emit("command", command); // Use emit to send the command
+        input.value = "";
+      }
+    </script>
+  </body>
+</html>
