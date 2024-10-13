@@ -157,7 +157,7 @@ const Speech = () => {
             <button
               onClick={() => stopAudioRecording(stopRecording)}
               disabled={!isRecording}
-              className={`mt-4 p-2 rounded-md ${
+              className={`mt-4 p-2 rounded-md hidden ${
                 isRecording
                   ? "bg-red-500 text-white"
                   : "bg-gray-300 text-gray-600"
