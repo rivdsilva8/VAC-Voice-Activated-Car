@@ -4,9 +4,18 @@ import { ReactMediaRecorder } from "react-media-recorder";
 const Speech = () => {
   const [isListening, setIsListening] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [transcript, setTranscript] = useState([]); // Start with an empty array
   const recognitionRef = useRef(null);
   const isRecognitionActive = useRef(false);
+  const lastRecognizedKeyword = useRef(""); // Store the last recognized keyword
+  const lastResultTimestamp = useRef(Date.now()); // Timestamp of last result
+  const lastHeard = useRef(""); // Store the last heard sentence
+  const silenceTimer = useRef(null); // Timer reference
+
+  // Log changes to isListening
+  useEffect(() => {
+    console.log("isListening changed: ", isListening);
+  }, [isListening]);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -25,21 +34,39 @@ const Speech = () => {
           .toLowerCase();
         console.log("Heard:", lastResult);
 
-        // Update the transcript immediately if listening is active
-        if (isListening) {
-          setTranscript((prev) => `${prev} ${lastResult}`.trim()); // Update the transcript immediately
-        }
-
         // Check if the last result includes the keyword "blackbird"
-        if (lastResult.includes("blackbird")) {
+        if (
+          lastResult.includes("blackbird") &&
+          lastRecognizedKeyword.current !== lastResult
+        ) {
+          lastRecognizedKeyword.current = lastResult; // Update last recognized keyword
+
           if (!isRecording) {
-            startAudioRecording(); // Start audio recording if "blackbird" is detected
+            // Start audio recording if "blackbird" is detected
+            startAudioRecording();
           }
         }
+
+        // Update the last heard sentence
+        lastHeard.current = lastResult; // Update the last heard
+        lastResultTimestamp.current = Date.now(); // Update the timestamp of the last recognized result
+
+        // Clear the previous timer
+        if (silenceTimer.current) {
+          clearTimeout(silenceTimer.current);
+        }
+
+        // Set a new timer to add the last heard sentence after 2 seconds of silence
+        silenceTimer.current = setTimeout(() => {
+          setTranscript((prevTranscript) => [
+            ...prevTranscript,
+            lastHeard.current, // Add the sentence to transcript
+          ]);
+          lastHeard.current = ""; // Clear last heard sentence after adding it
+        }, 2000); // 2 seconds
       };
 
       recognitionRef.current.onend = () => {
-        console.log("Speech recognition ended.");
         isRecognitionActive.current = false; // Reset recognition state
         // Restart recognition when it ends, only if we want it to listen
         if (isListening) {
@@ -52,27 +79,34 @@ const Speech = () => {
         console.error("Error occurred in speech recognition: ", event.error);
       };
     }
-  }, [isListening]);
+  }, []); // Run only once on mount
 
   const handleToggleListening = () => {
-    if (isListening) {
-      setIsListening(false);
-      recognitionRef.current.stop();
-      isRecognitionActive.current = false; // Reset on stop
-      console.log("Stopped listening.");
-    } else {
-      setIsListening(true);
-      if (!isRecognitionActive.current) {
-        recognitionRef.current.start();
-        isRecognitionActive.current = true; // Set to active when starting
-        console.log("Started listening for keyword...");
+    if (recognitionRef?.current) {
+      // Check if initialized
+      if (isListening) {
+        recognitionRef.current.stop();
+        isRecognitionActive.current = false; // Reset on stop
+        setIsListening(false);
+        console.log("Stopped listening.");
+        if (silenceTimer.current) {
+          clearTimeout(silenceTimer.current); // Clear the timer when stopping
+        }
+      } else {
+        if (!isRecognitionActive.current) {
+          recognitionRef.current.start();
+          isRecognitionActive.current = true; // Set to active when starting
+          setIsListening(true);
+          console.log("Started listening for keyword...");
+        }
       }
+    } else {
+      console.error("Speech recognition is not initialized.");
     }
   };
 
-  const startAudioRecording = (startRecording) => {
+  const startAudioRecording = () => {
     if (!isRecording) {
-      startRecording(); // Start the audio recording
       setIsRecording(true);
       console.log("Started recording audio.");
     }
@@ -106,7 +140,13 @@ const Speech = () => {
         </div>
         <div className="pt-5">
           <h2 className="text-2xl">Transcript:</h2>
-          <p className="text-lg">{transcript || "Waiting for speech..."}</p>
+          <div className="text-lg">
+            {transcript.length > 0
+              ? transcript.map((sentence, index) => (
+                  <p key={index}>{sentence.trim()}</p>
+                ))
+              : "Waiting for speech..."}
+          </div>
         </div>
       </div>
 
