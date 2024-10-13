@@ -12,22 +12,26 @@ const Speech = () => {
   const lastResultTimestamp = useRef(Date.now()); // Timestamp of last result
   const lastHeard = useRef(""); // Store the last heard sentence
   const silenceTimer = useRef(null); // Timer reference
+  const [hasMounted, setHasMounted] = useState(false);
+  const startAudioRef = useRef(new Audio("/yellowNotification.wav"));
+  const stopAudioRef = useRef(new Audio("/rednotification.wav"));
 
-  // Refs for audio elements
-  const startAudioRef = useRef(new Audio("/assets/start-listening.mp3"));
-  const stopAudioRef = useRef(new Audio("/assets/stop-listening.mp3"));
-
-  // Log changes to isListening
+  // Effect to set hasMounted to true after the first render
   useEffect(() => {
-    console.log("isListening changed: ", isListening);
+    setHasMounted(true);
+  }, []);
 
-    // Play sound when isListening changes
-    if (isListening) {
-      startAudioRef.current.play();
-    } else {
-      stopAudioRef.current.play();
+  // Effect to play sound when isListening changes
+  useEffect(() => {
+    if (hasMounted) {
+      // Only play sound after the component has mounted
+      if (isListening === true) {
+        startAudioRef.current.play().catch((error) => {
+          console.error("Error playing sound:", error);
+        });
+      }
     }
-  }, [isListening]);
+  }, [isListening, hasMounted]);
 
   const toggleShowTranscript = () => {
     setShowTranscript((prevShow) => !prevShow); // Toggle the display of the transcript
