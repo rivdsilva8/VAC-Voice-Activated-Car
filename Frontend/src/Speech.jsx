@@ -6,6 +6,7 @@ const Speech = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState([]); // Start with an empty array
   const recognitionRef = useRef(null);
+  const [showTranscript, setShowTranscript] = useState(false);
   const isRecognitionActive = useRef(false);
   const lastRecognizedKeyword = useRef(""); // Store the last recognized keyword
   const lastResultTimestamp = useRef(Date.now()); // Timestamp of last result
@@ -16,6 +17,10 @@ const Speech = () => {
   useEffect(() => {
     console.log("isListening changed: ", isListening);
   }, [isListening]);
+
+  const toggleShowTranscript = () => {
+    setShowTranscript((prevShow) => !prevShow); // Toggle the display of the transcript
+  };
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -35,37 +40,45 @@ const Speech = () => {
         console.log("Heard:", lastResult);
 
         // Check if the last result includes the keyword "blackbird"
-        if (
-          lastResult.includes("blackbird") &&
-          lastRecognizedKeyword.current !== lastResult
-        ) {
+        if (lastResult.includes("blackbird")) {
           lastRecognizedKeyword.current = lastResult; // Update last recognized keyword
 
           if (!isRecording) {
             // Start audio recording if "blackbird" is detected
             startAudioRecording();
           }
+
+          // Clear the previous timer
+          if (silenceTimer.current) {
+            clearTimeout(silenceTimer.current);
+          }
+
+          // Set a new timer to add the last heard sentence after 2 seconds of silence
+          silenceTimer.current = setTimeout(() => {
+            setTranscript((prevTranscript) => {
+              const lastTranscript = prevTranscript[prevTranscript.length - 1];
+              const timeSinceLastEntry =
+                Date.now() - lastResultTimestamp.current;
+
+              // Allow duplicates after 2 seconds
+              if (
+                (lastTranscript !== lastHeard.current ||
+                  timeSinceLastEntry >= 2000) &&
+                lastHeard.current !== ""
+              ) {
+                lastResultTimestamp.current = Date.now(); // Update timestamp when adding a new entry
+                return [...prevTranscript, lastHeard.current];
+              }
+
+              return prevTranscript; // Don't add if it's a duplicate within 2 seconds
+            });
+            lastHeard.current = ""; // Clear last heard sentence after adding it
+          }, 1000); // 1 seconds
         }
 
-        // Update the last heard sentence
-        lastHeard.current = lastResult; // Update the last heard
-        lastResultTimestamp.current = Date.now(); // Update the timestamp of the last recognized result
-
-        // Clear the previous timer
-        if (silenceTimer.current) {
-          clearTimeout(silenceTimer.current);
-        }
-
-        // Set a new timer to add the last heard sentence after 2 seconds of silence
-        silenceTimer.current = setTimeout(() => {
-          setTranscript((prevTranscript) => [
-            ...prevTranscript,
-            lastHeard.current, // Add the sentence to transcript
-          ]);
-          lastHeard.current = ""; // Clear last heard sentence after adding it
-        }, 1500); // 1.5 seconds
+        // Update the last heard sentence regardless, in case we want to handle it later
+        lastHeard.current = lastResult;
       };
-
       recognitionRef.current.onend = () => {
         isRecognitionActive.current = false; // Reset recognition state
         // Restart recognition when it ends, only if we want it to listen
@@ -148,6 +161,33 @@ const Speech = () => {
               : "Waiting for speech..."}
           </div>
         </div>
+      </div>
+      <div className="pt-5">
+        <h2 className="text-2xl">Transcript:</h2>
+        <button
+          onClick={toggleShowTranscript}
+          className="mt-2 p-2 bg-green-500 text-white rounded"
+        >
+          {showTranscript ? "Hide Transcript" : "Show Transcript"}
+        </button>
+        {showTranscript && (
+          <div className="text-lg">
+            {transcript.length > 0 ? (
+              <p>
+                [
+                {transcript.map((sentence, index) => (
+                  <span key={index}>
+                    "{sentence.trim()}"
+                    {index < transcript.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+                ]{transcript.length}
+              </p>
+            ) : (
+              "[]"
+            )}
+          </div>
+        )}
       </div>
 
       <ReactMediaRecorder
