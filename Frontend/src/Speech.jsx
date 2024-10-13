@@ -152,13 +152,17 @@ const Speech = () => {
           </button>
         </div>
         <div className="pt-5">
-          <h2 className="text-2xl">Transcript:</h2>
+          <h2 className="text-2xl">Commands:</h2>
           <div className="text-lg">
-            {transcript.length > 0
-              ? transcript.map((sentence, index) => (
-                  <p key={index}>{sentence.trim()}</p>
-                ))
-              : "Waiting for speech..."}
+            {transcript.length > 0 ? (
+              <ol className="list-decimal pl-5">
+                {transcript.map((sentence, index) => (
+                  <li key={index}>{sentence.trim()}</li>
+                ))}
+              </ol>
+            ) : (
+              "Waiting for speech..."
+            )}
           </div>
         </div>
       </div>
