@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ReactMediaRecorder } from "react-media-recorder";
+import { Socket } from "./Socket";
 
 const Speech = () => {
   const [isListening, setIsListening] = useState(false);
@@ -150,7 +151,7 @@ const Speech = () => {
 
   return (
     <div>
-      <div className="flex flex-col justify-center items-center pt-5 h-1/2">
+      <div className="flex flex-col justify-center items-center pt-5 h-1/2 border border-red-500">
         <h1 className="text-4xl">Voice Control</h1>
         <div className="flex flex-row pt-10">
           <button
@@ -232,6 +233,7 @@ const Speech = () => {
           </div>
         )}
       />
+      <Socket />
     </div>
   );
 };

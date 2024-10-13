@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,6 +11,8 @@
     <button onclick="sendCommand()">Send</button>
 
     <ul id="commands"></ul>
+    <ul id="responses"></ul>
+    <!-- Add a new list to display responses -->
 
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
     <script>
@@ -23,18 +24,19 @@
         console.log("Connected to server");
       });
 
-      socket.on("command", function (data) {
-        const commands = document.getElementById("commands");
+      socket.on("response", function (data) {
+        // Listen for the 'response' event
+        const responses = document.getElementById("responses");
         const li = document.createElement("li");
         li.appendChild(document.createTextNode(data));
-        commands.appendChild(li);
+        responses.appendChild(li);
       });
 
       function sendCommand() {
         const input = document.getElementById("commandInput");
         const command = input.value;
         socket.emit("command", command); // Use emit to send the command
-        input.value = "";
+        input.value = ""; // Clear the input field
       }
     </script>
   </body>
