@@ -63,7 +63,7 @@ const Speech = () => {
             lastHeard.current, // Add the sentence to transcript
           ]);
           lastHeard.current = ""; // Clear last heard sentence after adding it
-        }, 2000); // 2 seconds
+        }, 1500); // 1.5 seconds
       };
 
       recognitionRef.current.onend = () => {
