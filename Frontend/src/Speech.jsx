@@ -137,24 +137,9 @@ const Speech = () => {
   const handleChangeKeyword = (event) => {
     event.preventDefault(); // Prevent form submission
     if (newKeyword.trim() !== "") {
-      // Stop recognition before changing the keyword
-      if (isListening) {
-        recognitionRef.current.stop();
-        isRecognitionActive.current = false; // Reset on stop
-        console.log("Stopped listening to change keyword.");
-      }
-
       setKeyword(newKeyword.trim()); // Update the keyword
       setNewKeyword(""); // Clear the input field
       console.log("Keyword changed to:", newKeyword);
-
-      // Restart recognition with the new keyword
-      if (!isRecognitionActive.current) {
-        recognitionRef.current.start();
-        isRecognitionActive.current = true; // Set to active when starting
-        setIsListening(true);
-        console.log("Started listening for keyword...");
-      }
     }
   };
   const startAudioRecording = () => {
@@ -205,8 +190,8 @@ const Speech = () => {
                 Submit
               </button>
             </form>
-            <span className="text-red-500 ">
-              note: do not change keyword once you have started listening
+            <span className="bg-red-500 my-2 p-2">
+              note: do NOT change keyword once you have started listening
             </span>
           </div>
         </div>
@@ -241,7 +226,10 @@ const Speech = () => {
         </div>
       </div>
       <div className="p-5 bg-zinc-500 rounded-md m-2 w-1/4  h-fit">
-        <h2 className="text-4xl">Command Array:</h2>
+        <h2 className="text-4xl">
+          Command Array{" "}
+          {transcript.length > 0 ? "(" + transcript.length + ")" : ""}:
+        </h2>
         <button
           onClick={toggleShowTranscript}
           className="mt-2 p-2 bg-green-500 text-white rounded "
@@ -259,7 +247,7 @@ const Speech = () => {
                     {index < transcript.length - 1 ? ", " : ""}
                   </span>
                 ))}
-                ]{transcript.length}
+                ]
               </p>
             ) : (
               "[]"
