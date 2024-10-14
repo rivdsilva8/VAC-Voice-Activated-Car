@@ -1,21 +1,19 @@
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_SERVER_URL = "http://127.0.0.1:5000"; // Change this to your server URL if needed
-
+const SOCKET_SERVER_URL = "http://127.0.0.1:5000"; 
 export const Socket = ({ transcript }) => {
   const [socket, setSocket] = useState(null);
   const [commandInput, setCommandInput] = useState("");
   const [responses, setResponses] = useState([]);
   const startAudioRef = useRef(new Audio("/yellowNotification.wav"));
   useEffect(() => {
-    // Create a socket connection when the component mounts
+
     const newSocket = io(SOCKET_SERVER_URL, {
-      transports: ["polling"], // Use polling transport
+      transports: ["polling"], 
     });
     setSocket(newSocket);
 
-    // Listen for response events
     newSocket.on("response", (data) => {
       setResponses((prevResponses) => [
         ...prevResponses,
@@ -26,7 +24,6 @@ export const Socket = ({ transcript }) => {
       });
     });
 
-    // Cleanup on unmount
     return () => {
       newSocket.disconnect();
     };
@@ -39,18 +36,18 @@ export const Socket = ({ transcript }) => {
       setResponses((prevResponses) => [
         ...prevResponses,
         { type: "client", message: transcript[transcript?.length - 1] },
-      ]); // Add client message to responses
+      ]);
     }
   }, [transcript]);
 
   const sendCommand = () => {
     if (socket && commandInput) {
-      socket.emit("command", commandInput); // Emit the command to the server
+      socket.emit("command", commandInput); 
       setResponses((prevResponses) => [
         ...prevResponses,
         { type: "client", message: commandInput },
-      ]); // Add client message to responses
-      setCommandInput(""); // Clear the input field
+      ]); 
+      setCommandInput(""); 
     }
   };
 

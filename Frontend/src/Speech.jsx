@@ -6,14 +6,14 @@ const Speech = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [keyword, setKeyword] = useState("blackbird");
   const [newKeyword, setNewKeyword] = useState("");
-  const [transcript, setTranscript] = useState([]); // Start with an empty array
+  const [transcript, setTranscript] = useState([]); 
   const recognitionRef = useRef(null);
   const [showTranscript, setShowTranscript] = useState(false);
   const isRecognitionActive = useRef(false);
-  const lastRecognizedKeyword = useRef(""); // Store the last recognized keyword
-  const lastResultTimestamp = useRef(Date.now()); // Timestamp of last result
-  const lastHeard = useRef(""); // Store the last heard sentence
-  const silenceTimer = useRef(null); // Timer reference
+  const lastRecognizedKeyword = useRef(""); 
+  const lastResultTimestamp = useRef(Date.now()); 
+  const lastHeard = useRef(""); 
+  const silenceTimer = useRef(null); 
   const [hasMounted, setHasMounted] = useState(false);
   const startAudioRef = useRef(new Audio("/yellowNotification.wav"));
   // const stopAudioRef = useRef(new Audio("/rednotification.wav"));
@@ -35,7 +35,7 @@ const Speech = () => {
   }, [isListening, hasMounted]);
 
   const toggleShowTranscript = () => {
-    setShowTranscript((prevShow) => !prevShow); // Toggle the display of the transcript
+    setShowTranscript((prevShow) => !prevShow); 
   };
 
   // Initialize Speech Recognition
@@ -135,10 +135,10 @@ const Speech = () => {
   };
 
   const handleChangeKeyword = (event) => {
-    event.preventDefault(); // Prevent form submission
+    event.preventDefault(); 
     if (newKeyword.trim() !== "") {
-      setKeyword(newKeyword.trim()); // Update the keyword
-      setNewKeyword(""); // Clear the input field
+      setKeyword(newKeyword.trim()); 
+      setNewKeyword(""); 
       console.log("Keyword changed to:", newKeyword);
     }
   };
@@ -151,7 +151,7 @@ const Speech = () => {
 
   const stopAudioRecording = (stopRecording) => {
     if (isRecording) {
-      stopRecording(); // Stop the audio recording
+      stopRecording(); 
       setIsRecording(false);
       console.log("Stopped recording audio.");
     }
@@ -181,8 +181,8 @@ const Speech = () => {
             <form onSubmit={handleChangeKeyword}>
               <input
                 type="text"
-                value={newKeyword} // Bind the input value to newKeyword state
-                onChange={(e) => setNewKeyword(e.target.value)} // Update newKeyword state on input change
+                value={newKeyword} 
+                onChange={(e) => setNewKeyword(e.target.value)} 
                 className="p-2 rounded-s-md text-black"
                 placeholder="Change Keyword"
               />
