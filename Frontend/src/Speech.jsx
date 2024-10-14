@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ReactMediaRecorder } from "react-media-recorder";
 import { Socket } from "./Socket";
-
 const Speech = () => {
   const [isListening, setIsListening] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -150,8 +149,8 @@ const Speech = () => {
   };
 
   return (
-    <div>
-      <div className="flex flex-col justify-center items-center pt-5 h-1/2 border border-red-500">
+    <div className="p-2 = flex">
+      <div className="flex flex-col justify-center items-center p-5 m-2 h-1/2   bg-zinc-500 rounded-md w-1/2">
         <h1 className="text-4xl">Voice Control</h1>
         <div className="flex flex-row pt-10">
           <button
@@ -182,13 +181,13 @@ const Speech = () => {
           </div>
         </div>
       </div>
-      <div className="pt-5">
-        <h2 className="text-2xl">Command Array:</h2>
+      <div className="p-5 bg-zinc-500 rounded-md m-2 w-1/4  h-fit">
+        <h2 className="text-4xl">Command Array:</h2>
         <button
           onClick={toggleShowTranscript}
-          className="mt-2 p-2 bg-green-500 text-white rounded"
+          className="mt-2 p-2 bg-green-500 text-white rounded "
         >
-          {showTranscript ? "Hide Transcript" : "Show Transcript"}
+          {showTranscript ? "Hide Commands" : "Show Commands"}
         </button>
         {showTranscript && (
           <div className="text-lg">
@@ -233,7 +232,7 @@ const Speech = () => {
           </div>
         )}
       />
-      <Socket />
+      <Socket transcript={transcript} />
     </div>
   );
 };
