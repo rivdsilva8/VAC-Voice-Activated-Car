@@ -4,6 +4,8 @@ import { Socket } from "./Socket";
 const Speech = () => {
   const [isListening, setIsListening] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [keyword, setKeyword] = useState("blackbird");
+  const [newKeyword, setNewKeyword] = useState("");
   const [transcript, setTranscript] = useState([]); // Start with an empty array
   const recognitionRef = useRef(null);
   const [showTranscript, setShowTranscript] = useState(false);
@@ -14,7 +16,7 @@ const Speech = () => {
   const silenceTimer = useRef(null); // Timer reference
   const [hasMounted, setHasMounted] = useState(false);
   const startAudioRef = useRef(new Audio("/yellowNotification.wav"));
-  const stopAudioRef = useRef(new Audio("/rednotification.wav"));
+  // const stopAudioRef = useRef(new Audio("/rednotification.wav"));
 
   // Effect to set hasMounted to true after the first render
   useEffect(() => {
@@ -24,11 +26,10 @@ const Speech = () => {
   // Effect to play sound when isListening changes
   useEffect(() => {
     if (hasMounted) {
-      // Only play sound after the component has mounted
       if (isListening === true) {
-        startAudioRef.current.play().catch((error) => {
-          console.error("Error playing sound:", error);
-        });
+        // startAudioRef.current.play().catch((error) => {
+        //   console.error("Error playing sound:", error);
+        // });
       }
     }
   }, [isListening, hasMounted]);
@@ -54,12 +55,12 @@ const Speech = () => {
           .toLowerCase();
         console.log("Heard:", lastResult);
 
-        // Check if the last result includes the keyword "blackbird"
-        if (lastResult.includes("blackbird")) {
+        // Check if the last result includes the keyword
+        if (lastResult.includes(keyword)) {
           lastRecognizedKeyword.current = lastResult; // Update last recognized keyword
 
           if (!isRecording) {
-            // Start audio recording if "blackbird" is detected
+            // Start audio recording if keyword is detected
             startAudioRecording();
           }
 
@@ -107,7 +108,7 @@ const Speech = () => {
         console.error("Error occurred in speech recognition: ", event.error);
       };
     }
-  }, []); // Run only once on mount
+  }, [keyword]); // run when keyword is changed
 
   const handleToggleListening = () => {
     if (recognitionRef?.current) {
@@ -133,6 +134,29 @@ const Speech = () => {
     }
   };
 
+  const handleChangeKeyword = (event) => {
+    event.preventDefault(); // Prevent form submission
+    if (newKeyword.trim() !== "") {
+      // Stop recognition before changing the keyword
+      if (isListening) {
+        recognitionRef.current.stop();
+        isRecognitionActive.current = false; // Reset on stop
+        console.log("Stopped listening to change keyword.");
+      }
+
+      setKeyword(newKeyword.trim()); // Update the keyword
+      setNewKeyword(""); // Clear the input field
+      console.log("Keyword changed to:", newKeyword);
+
+      // Restart recognition with the new keyword
+      if (!isRecognitionActive.current) {
+        recognitionRef.current.start();
+        isRecognitionActive.current = true; // Set to active when starting
+        setIsListening(true);
+        console.log("Started listening for keyword...");
+      }
+    }
+  };
   const startAudioRecording = () => {
     if (!isRecording) {
       setIsRecording(true);
@@ -150,11 +174,46 @@ const Speech = () => {
 
   return (
     <div className="p-2 = flex">
-      <div className="flex flex-col justify-center items-center p-5 m-2 h-1/2   bg-zinc-500 rounded-md w-1/2">
-        <h1 className="text-4xl">Voice Control</h1>
+      <div className="flex flex-col justify-center items-left p-5 m-2 h-1/2   bg-zinc-500 rounded-md w-1/2">
+        <div className="flex items-left gap-x-2">
+          <div className=" w-2/3">
+            <h1 className="text-4xl text-black">Voice Control</h1>
+            <h1 className="text-4xl text-black">
+              Current Keyword:{" "}
+              <span className="text-yellow-400">{keyword} </span>{" "}
+            </h1>
+            <h2 className="text-xl text-wrap w-2/3 ">
+              say <span className="text-yellow-400 ">{keyword} </span> in a
+              sentence to start sending commands,
+              <div>
+                example: <span className="text-yellow-400">{keyword} </span>{" "}
+                move north
+              </div>
+            </h2>
+          </div>
+          <div className=" p-2 w-1/3 flex flex-col">
+            <h1 className="text-xl">Change Keyword</h1>
+            <form onSubmit={handleChangeKeyword}>
+              <input
+                type="text"
+                value={newKeyword} // Bind the input value to newKeyword state
+                onChange={(e) => setNewKeyword(e.target.value)} // Update newKeyword state on input change
+                className="p-2 rounded-s-md text-black"
+                placeholder="Change Keyword"
+              />
+              <button type="submit" className="p-2 bg-yellow-400 rounded-r-md">
+                Submit
+              </button>
+            </form>
+            <span className="text-red-500 ">
+              note: do not change keyword once you have started listening
+            </span>
+          </div>
+        </div>
+
         <div className="flex flex-row pt-10">
           <button
-            className={`transition duration-300 p-2 ${
+            className={`transition duration-300 p-2 rounded-md ${
               isListening
                 ? "  strobe text-black bg-yellow-500"
                 : "bg-stone-600 text-white"

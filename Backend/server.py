@@ -15,7 +15,7 @@ def handle_command(cmd):
     print(f'Received command: {cmd}')
     # process the command
     #sort into command bucket
-    response = f'Server recieved: {cmd}'  # Prepare response
+    response = f'{cmd}'  # Prepare response
     emit('response', response)  # Emit the response back to the client
 
 if __name__ == '__main__':
