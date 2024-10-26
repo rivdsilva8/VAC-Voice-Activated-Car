@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit  # Import emit
+from logistic_regression_model import classify_command 
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*", transports=['polling'])
@@ -14,8 +15,9 @@ def index():
 def handle_command(cmd):
     print(f'Received command: {cmd}')
     # process the command
-    #sort into command bucket
-    response = f'{cmd}'  # Prepare response
+    # Classify the command using the function
+    classified_command = classify_command(cmd)
+    response = f'Classified as: {classified_command}'  # Prepare response
     emit('response', response)  # Emit the response back to the client
 
 if __name__ == '__main__':

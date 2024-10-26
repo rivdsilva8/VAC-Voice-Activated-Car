@@ -1,16 +1,15 @@
 import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 
-const SOCKET_SERVER_URL = "http://127.0.0.1:5000"; 
+const SOCKET_SERVER_URL = "http://127.0.0.1:5000";
 export const Socket = ({ transcript }) => {
   const [socket, setSocket] = useState(null);
   const [commandInput, setCommandInput] = useState("");
   const [responses, setResponses] = useState([]);
   const startAudioRef = useRef(new Audio("/yellowNotification.wav"));
   useEffect(() => {
-
     const newSocket = io(SOCKET_SERVER_URL, {
-      transports: ["polling"], 
+      transports: ["polling"],
     });
     setSocket(newSocket);
 
@@ -42,17 +41,17 @@ export const Socket = ({ transcript }) => {
 
   const sendCommand = () => {
     if (socket && commandInput) {
-      socket.emit("command", commandInput); 
+      socket.emit("command", commandInput);
       setResponses((prevResponses) => [
         ...prevResponses,
         { type: "client", message: commandInput },
-      ]); 
-      setCommandInput(""); 
+      ]);
+      setCommandInput("");
     }
   };
 
   return (
-    <div className="bg-zinc-500 rounded-md p-5 m-2 w-1/4">
+    <div className="bg-zinc-500 rounded-md p-5 m-2 w-1/4 ">
       <h2 className="text-4xl pb-4">SocketIO React Component</h2>
       <input
         type="text"
@@ -68,7 +67,7 @@ export const Socket = ({ transcript }) => {
         Send
       </button>
 
-      <ul className="my-2 bg-stone-950 text-black rounded-md p-4">
+      <ul className="my-2 bg-stone-950 text-black rounded-md p-4 max-h-[600px] overflow-y-scroll">
         {responses.length > 0 ? (
           responses.map((response, index) => (
             <li
